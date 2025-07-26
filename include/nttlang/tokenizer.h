@@ -26,21 +26,29 @@ namespace ntt
          *      current token. This is the shared attribute between all tokens.
          */
         TokenType type;
+
+        Token(TokenType type) : type(type) {}
     };
 
     struct IntegerToken : public Token
     {
         int32_t value; ///< The integer value of this programming language is 32-bit integer
+
+        IntegerToken(int32_t value) : Token(TokenType::Integer), value(value) {}
     };
 
     struct FloatToken : public Token
     {
         float value; ///< The float value of this programming language is 32-bit float
+
+        FloatToken(float value) : Token(TokenType::Float), value(value) {}
     };
 
     struct StringToken : public Token
     {
         std::string value; ///< The string value of this programming language
+
+        StringToken(const std::string &value) : Token(TokenType::String), value(value) {}
     };
 
     /**

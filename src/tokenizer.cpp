@@ -19,10 +19,7 @@ namespace ntt
 
     static TokenCallback s_string_token_callback = [](const std::smatch &match) -> Token *
     {
-        return new StringToken{
-            TokenType::String,
-            match[0].str().substr(1, match[0].str().size() - 2),
-        };
+        return new StringToken(match[0].str().substr(1, match[0].str().size() - 2));
     };
 
     static std::vector<TokenSyntaxRule> s_token_syntax_rules = {
@@ -30,30 +27,25 @@ namespace ntt
             R"(^(-?[0-9]*\.[0-9]+f?|-?[0-9]*f))",
             [](const std::smatch &match) -> Token *
             {
-                return new FloatToken{
-                    TokenType::Float,
-                    std::stof(match[0].str()),
-                };
+                return new FloatToken(std::stof(match[0].str()));
             },
         },
         {
             R"(^-?[0-9]+)",
             [](const std::smatch &match) -> Token *
             {
-                return new IntegerToken{
-                    TokenType::Integer,
-                    std::stoi(match[0].str()),
-                };
+                return new IntegerToken(std::stoi(match[0].str()));
             },
+        },
+        {
+            R"(^'[\s\S]*')",
+            s_string_token_callback,
         },
         {
             R"(^"[\s\S]*|\\\"|[^"]")",
             s_string_token_callback,
         },
-        {
-            R"(^'[\s\S]*')",
-            s_string_token_callback,
-        }};
+    };
 
     Tokenizer::Tokenizer(const std::string &code) : m_code(code)
     {
