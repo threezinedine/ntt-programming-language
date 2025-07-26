@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Build Project",
+			"command": "b.bat",
+			"windows": {
+				"command": "b.bat"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}/PCBuild/Windows/MinGW/Debug"
+			},
+			"problemMatcher": [
+				"$gcc"
+			]
+		}
+	]
+}

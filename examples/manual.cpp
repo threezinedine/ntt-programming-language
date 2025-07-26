@@ -5,8 +5,8 @@ using namespace ntt;
 
 int main(void)
 {
-    Tokenizer tokenizer("54");
+    Tokenizer tokenizer("\"Hello\\\"World\"");
     tokenizer.extract();
-    printf("Token value: %d\n", TO_NUMBER(tokenizer.get_token(0))->value);
+    printf("Token value: %s\n", TO_STRING(tokenizer.get_token(0))->value.c_str());
     return 0;
 }
