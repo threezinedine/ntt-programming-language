@@ -12,6 +12,8 @@ namespace ntt
         Integer, ///< Any integer number which contains negative sign
         Float,   ///< Any float number which contains negative sign
         String,  ///< Any string which is wrapped by double quotes or single quotes
+
+        Unknown, ///< Any character which is not a valid token
     };
 
     /**
@@ -49,6 +51,13 @@ namespace ntt
         std::string value; ///< The string value of this programming language
 
         StringToken(const std::string &value) : Token(TokenType::String), value(value) {}
+    };
+
+    struct UnknownToken : public Token
+    {
+        char value; ///< The character value of this programming language
+
+        UnknownToken(char value) : Token(TokenType::Unknown), value(value) {}
     };
 
     /**
@@ -92,3 +101,4 @@ namespace ntt
 #define TO_INTEGER(token) static_cast<::ntt::IntegerToken *>(token)
 #define TO_FLOAT(token) static_cast<::ntt::FloatToken *>(token)
 #define TO_STRING(token) static_cast<::ntt::StringToken *>(token)
+#define TO_UNKNOWN(token) static_cast<::ntt::UnknownToken *>(token)

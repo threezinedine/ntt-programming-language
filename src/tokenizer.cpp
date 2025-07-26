@@ -60,14 +60,43 @@ namespace ntt
     {
         release_tokenes();
 
-        for (auto &rule : s_token_syntax_rules)
+        /**
+         * used for storing the string which is processed, during the
+         *      the processing time, the original string will not be modified.
+         */
+        std::string tempCode = m_code;
+
+        while (!tempCode.empty())
         {
-            std::regex regex(rule.regex);
-            std::smatch match;
-            if (std::regex_search(m_code, match, regex))
+            bool is_matched = false;
+
+            // remove spaces to the next token
             {
-                m_tokens.push_back(rule.callback(match));
-                break;
+                std::regex regex(R"(^[\s\n]+)");
+                std::smatch match;
+                if (std::regex_search(tempCode, match, regex))
+                {
+                    tempCode = tempCode.substr(match.position() + match.length());
+                }
+            }
+
+            for (auto &rule : s_token_syntax_rules)
+            {
+                std::regex regex(rule.regex);
+                std::smatch match;
+                if (std::regex_search(tempCode, match, regex))
+                {
+                    is_matched = true;
+                    m_tokens.push_back(rule.callback(match));
+                    tempCode = tempCode.substr(match.position() + match.length());
+                    break;
+                }
+            }
+
+            if (!is_matched)
+            {
+                m_tokens.push_back(new UnknownToken(tempCode[0]));
+                tempCode = tempCode.substr(1);
             }
         }
     }
