@@ -10,5 +10,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
 
     add_executable(${EXAMPLE_NAME} ${EXAMPLE_FILE})
     target_link_libraries(${EXAMPLE_NAME} PRIVATE ${PROJECT_NAME})
+
+    set_target_properties(${EXAMPLE_NAME} PROPERTIES FOLDER "Examples")
 endforeach()
 

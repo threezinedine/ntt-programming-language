@@ -9,6 +9,7 @@
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
+                "DEBUG",
                 "MINGW"
             ],
             "windowsSdkVersion": "10.0.22621.0",

@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstdint>
 #include <memory>
+#include <stdexcept>
 
 namespace ntt
 {
@@ -165,6 +166,27 @@ namespace ntt
         std::vector<Token *> m_tokens;
     };
 } // namespace ntt
+
+#ifdef DEBUG
+#define ASSERT_TOKEN_TYPE(token, expectedType)           \
+    if (token->type != ::ntt::TokenType::expectedType)   \
+    {                                                    \
+        throw std::runtime_error("Token type mismatch"); \
+    }
+#else
+#define ASSERT_TOKEN_TYPE(token, expectedType)
+#endif
+
+#define ASSERT_TOKEN_AS_INTEGER(token) ASSERT_TOKEN_TYPE(token, Integer)
+#define ASSERT_TOKEN_AS_FLOAT(token) ASSERT_TOKEN_TYPE(token, Float)
+#define ASSERT_TOKEN_AS_STRING(token) ASSERT_TOKEN_TYPE(token, String)
+#define ASSERT_TOKEN_AS_IDENTIFIER(token) ASSERT_TOKEN_TYPE(token, Identifier)
+#define ASSERT_TOKEN_AS_KEYWORD(token) ASSERT_TOKEN_TYPE(token, Keyword)
+#define ASSERT_TOKEN_AS_INVALID_IDENTIFIER(token) ASSERT_TOKEN_TYPE(token, InvalidIdentifier)
+#define ASSERT_TOKEN_AS_PARENTHESIS(token) ASSERT_TOKEN_TYPE(token, Parenthesis)
+#define ASSERT_TOKEN_AS_SEPARATOR(token) ASSERT_TOKEN_TYPE(token, Separator)
+#define ASSERT_TOKEN_AS_OPERATOR(token) ASSERT_TOKEN_TYPE(token, Operator)
+#define ASSERT_TOKEN_AS_UNKNOWN(token) ASSERT_TOKEN_TYPE(token, Unknown)
 
 #define TO_INTEGER(token) static_cast<::ntt::IntegerToken *>(token)
 #define TO_FLOAT(token) static_cast<::ntt::FloatToken *>(token)
