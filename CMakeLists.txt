@@ -24,6 +24,12 @@ add_library(
     ${SOURCE_FILES}
 )
 
+if (MSVC)
+    add_compile_definitions(MSVC)
+elseif (MINGW)
+    add_compile_definitions(MINGW)
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/examples)

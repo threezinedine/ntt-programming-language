@@ -15,6 +15,8 @@ namespace ntt
         Identifier,  ///< Any identifier which is a sequence of letters, numbers, and underscores
         Keyword,     ///< Any keyword which is a sequence of letters, numbers, and underscores
         Parenthesis, ///< Any parenthesis which is a sequence of letters, numbers, and underscores
+        Separator,   ///< Any separator which is a sequence of letters, numbers, and underscores
+        Operator,    ///< Any operator which is a sequence of letters, numbers, and underscores
 
         InvalidIdentifier, ///< Any identifier which is not a valid identifier
 
@@ -33,64 +35,97 @@ namespace ntt
          *      current token. This is the shared attribute between all tokens.
          */
         TokenType type;
+        uint32_t start_position; ///< The index position inside the current code (the global one)
+        uint32_t length;         ///< The length of the current token
 
-        Token(TokenType type) : type(type) {}
+        Token(TokenType type, const uint32_t &start_position, const uint32_t &length)
+            : type(type), start_position(start_position), length(length)
+        {
+        }
     };
 
     struct IntegerToken : public Token
     {
         int32_t value; ///< The integer value of this programming language is 32-bit integer
 
-        IntegerToken(int32_t value) : Token(TokenType::Integer), value(value) {}
+        IntegerToken(int32_t value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::Integer, start_position, length), value(value)
+        {
+        }
     };
 
     struct FloatToken : public Token
     {
         float value; ///< The float value of this programming language is 32-bit float
 
-        FloatToken(float value) : Token(TokenType::Float), value(value) {}
+        FloatToken(float value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::Float, start_position, length), value(value)
+        {
+        }
     };
 
     struct StringToken : public Token
     {
         std::string value; ///< The string value of this programming language
 
-        StringToken(const std::string &value) : Token(TokenType::String), value(value) {}
+        StringToken(const std::string &value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::String, start_position, length), value(value) {}
     };
 
     struct IdentifierToken : public Token
     {
         std::string value; ///< The identifier value of this programming language
 
-        IdentifierToken(const std::string &value) : Token(TokenType::Identifier), value(value) {}
+        IdentifierToken(const std::string &value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::Identifier, start_position, length), value(value) {}
     };
 
     struct KeywordToken : public Token
     {
         std::string value; ///< The keyword value of this programming language
 
-        KeywordToken(const std::string &value) : Token(TokenType::Keyword), value(value) {}
+        KeywordToken(const std::string &value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::Keyword, start_position, length), value(value) {}
     };
 
     struct InvalidIdentifierToken : public Token
     {
         std::string value; ///< The invalid identifier value of this programming language
 
-        InvalidIdentifierToken(const std::string &value) : Token(TokenType::InvalidIdentifier), value(value) {}
+        InvalidIdentifierToken(const std::string &value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::InvalidIdentifier, start_position, length), value(value) {}
     };
 
     struct ParenthesisToken : public Token
     {
         std::string value; ///< The parenthesis value of this programming language
 
-        ParenthesisToken(const std::string &value) : Token(TokenType::Parenthesis), value(value) {}
+        ParenthesisToken(const std::string &value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::Parenthesis, start_position, length), value(value) {}
+    };
+
+    struct SeparatorToken : public Token
+    {
+        std::string value; ///< The separator value of this programming language
+
+        SeparatorToken(const std::string &value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::Separator, start_position, length), value(value) {}
+    };
+
+    struct OperatorToken : public Token
+    {
+        std::string value; ///< The operator value of this programming language
+
+        OperatorToken(const std::string &value, const uint32_t &start_position, const uint32_t &length)
+            : Token(TokenType::Operator, start_position, length), value(value) {}
     };
 
     struct UnknownToken : public Token
     {
         std::string value; ///< The character value of this programming language
 
-        UnknownToken(const std::string &value) : Token(TokenType::Unknown), value(value) {}
+        UnknownToken(const std::string &value, uint32_t start_position, uint32_t length)
+            : Token(TokenType::Unknown, start_position, length), value(value) {}
     };
 
     /**
@@ -138,4 +173,6 @@ namespace ntt
 #define TO_KEYWORD(token) static_cast<::ntt::KeywordToken *>(token)
 #define TO_INVALID_IDENTIFIER(token) static_cast<::ntt::InvalidIdentifierToken *>(token)
 #define TO_PARENTHESIS(token) static_cast<::ntt::ParenthesisToken *>(token)
+#define TO_SEPARATOR(token) static_cast<::ntt::SeparatorToken *>(token)
+#define TO_OPERATOR(token) static_cast<::ntt::OperatorToken *>(token)
 #define TO_UNKNOWN(token) static_cast<::ntt::UnknownToken *>(token)

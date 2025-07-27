@@ -32,6 +32,12 @@ using namespace ntt;
 #define EXPECT_TOKEN_PARENTHESIS(index, expectedValue) \
     EXPECT_TOKEN_TYPE(index, Parenthesis);             \
     EXPECT_THAT(TO_PARENTHESIS(tokenizer.get_token(index))->value, expectedValue)
+#define EXPECT_TOKEN_SEPARATOR(index, expectedValue) \
+    EXPECT_TOKEN_TYPE(index, Separator);             \
+    EXPECT_THAT(TO_SEPARATOR(tokenizer.get_token(index))->value, expectedValue)
+#define EXPECT_TOKEN_OPERATOR(index, expectedValue) \
+    EXPECT_TOKEN_TYPE(index, Operator);             \
+    EXPECT_THAT(TO_OPERATOR(tokenizer.get_token(index))->value, expectedValue)
 
 #define EXPECT_TOKEN_UNKNOWN(index, expectedValue) \
     EXPECT_TOKEN_TYPE(index, Unknown);             \
@@ -203,17 +209,60 @@ TEST(Tokenizer, extract_parenthesis)
 
 TEST(Tokenizer, extract_if_statement)
 {
-    DEFINE_TOKEN("if (123) { 54f } else { 54 }");
-    EXPECT_TOKEN_COUNT(11);
+    DEFINE_TOKEN("if (123) { 54f; } else { 54; }");
+    EXPECT_TOKEN_COUNT(13);
     EXPECT_TOKEN_KEYWORD(0, "if");
     EXPECT_TOKEN_PARENTHESIS(1, "(");
     EXPECT_TOKEN_INTEGER(2, 123);
     EXPECT_TOKEN_PARENTHESIS(3, ")");
     EXPECT_TOKEN_PARENTHESIS(4, "{");
     EXPECT_TOKEN_FLOAT(5, 54);
-    EXPECT_TOKEN_PARENTHESIS(6, "}");
-    EXPECT_TOKEN_KEYWORD(7, "else");
-    EXPECT_TOKEN_PARENTHESIS(8, "{");
-    EXPECT_TOKEN_INTEGER(9, 54);
-    EXPECT_TOKEN_PARENTHESIS(10, "}");
+    EXPECT_TOKEN_SEPARATOR(6, ";");
+    EXPECT_TOKEN_PARENTHESIS(7, "}");
+    EXPECT_TOKEN_KEYWORD(8, "else");
+    EXPECT_TOKEN_PARENTHESIS(9, "{");
+    EXPECT_TOKEN_INTEGER(10, 54);
+    EXPECT_TOKEN_SEPARATOR(11, ";");
+    EXPECT_TOKEN_PARENTHESIS(12, "}");
+}
+
+TEST(Tokenizer, extract_uppercase_keyword_as_identifier)
+{
+    DEFINE_TOKEN("IF");
+    EXPECT_TOKEN_COUNT(1);
+    EXPECT_TOKEN_IDENTIFIER(0, "IF");
+}
+
+TEST(Tokenizer, extract_semi_colon)
+{
+    DEFINE_TOKEN(";");
+    EXPECT_TOKEN_COUNT(1);
+    EXPECT_TOKEN_SEPARATOR(0, ";");
+}
+
+TEST(Tokenizer, extract_define_statement)
+{
+    DEFINE_TOKEN("let a, b = 3.14;");
+    EXPECT_TOKEN_COUNT(7);
+    EXPECT_TOKEN_KEYWORD(0, "let");
+    EXPECT_TOKEN_IDENTIFIER(1, "a");
+    EXPECT_TOKEN_SEPARATOR(2, ",");
+    EXPECT_TOKEN_IDENTIFIER(3, "b");
+    EXPECT_TOKEN_OPERATOR(4, "=");
+    EXPECT_TOKEN_FLOAT(5, 3.14);
+    EXPECT_TOKEN_SEPARATOR(6, ";");
+}
+
+TEST(Tokenizer, extract_checking_statement)
+{
+    DEFINE_TOKEN(" i     == 3.14;  \n   i != 3.14f;");
+    EXPECT_TOKEN_COUNT(8);
+    EXPECT_TOKEN_IDENTIFIER(0, "i");
+    EXPECT_TOKEN_OPERATOR(1, "==");
+    EXPECT_TOKEN_FLOAT(2, 3.14);
+    EXPECT_TOKEN_SEPARATOR(3, ";");
+    EXPECT_TOKEN_IDENTIFIER(4, "i");
+    EXPECT_TOKEN_OPERATOR(5, "!=");
+    EXPECT_TOKEN_FLOAT(6, 3.14);
+    EXPECT_TOKEN_SEPARATOR(7, ";");
 }
