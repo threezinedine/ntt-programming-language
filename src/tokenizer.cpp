@@ -3,10 +3,11 @@
 #include <vector>
 #include <regex>
 #include <functional>
+#include <nttlang/macros.h>
 
 namespace ntt
 {
-    typedef std::function<Token *(const std::smatch &)> TokenCallback;
+    typedef std::function<Token *(const std::smatch &, std::string &)> TokenCallback;
 
     /**
      * The the store information about the token syntax checking.
@@ -17,23 +18,69 @@ namespace ntt
         TokenCallback callback; ///< The function which will be used to create the token
     };
 
-    static TokenCallback s_string_token_callback = [](const std::smatch &match) -> Token *
+    static TokenCallback s_string_token_callback = [](const std::smatch &match, std::string &tempCode) -> Token *
     {
+        NTT_UNUSED(tempCode);
         return new StringToken(match[0].str().substr(1, match[0].str().size() - 2));
     };
 
+    static bool is_character(char c)
+    {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    static const std::string keyword_chains = "(if|else)";
+
     static std::vector<TokenSyntaxRule> s_token_syntax_rules = {
+        // keywords
+        {
+            "(^" + keyword_chains + "[{()};\\s])|(^" + keyword_chains + "$)",
+            [](const std::smatch &match, std::string &tempCode) -> Token *
+            {
+                const std::string &keyword = match[0].str();
+                if (is_character(keyword[keyword.size() - 1]))
+                {
+                    return new KeywordToken(keyword);
+                }
+                else
+                {
+                    tempCode = keyword[keyword.size() - 1] + tempCode;
+                    return new KeywordToken(keyword.substr(0, keyword.size() - 1));
+                }
+            },
+        },
+
+        // invalid identifier
+        {
+            R"(^[0-9]+[a-eg-zA-EG-Z_]+[\S]*)",
+            [](const std::smatch &match, std::string &tempCode) -> Token *
+            {
+                NTT_UNUSED(tempCode);
+                return new InvalidIdentifierToken(match[0].str());
+            },
+        },
+        {
+            R"(^[a-zA-Z_][a-zA-Z0-9_]*)",
+            [](const std::smatch &match, std::string &tempCode) -> Token *
+            {
+                NTT_UNUSED(tempCode);
+                return new IdentifierToken(match[0].str());
+            },
+        },
+
         {
             R"(^(-?[0-9]*\.[0-9]+f?|-?[0-9]*f))",
-            [](const std::smatch &match) -> Token *
+            [](const std::smatch &match, std::string &tempCode) -> Token *
             {
+                NTT_UNUSED(tempCode);
                 return new FloatToken(std::stof(match[0].str()));
             },
         },
         {
             R"(^-?[0-9]+)",
-            [](const std::smatch &match) -> Token *
+            [](const std::smatch &match, std::string &tempCode) -> Token *
             {
+                NTT_UNUSED(tempCode);
                 return new IntegerToken(std::stoi(match[0].str()));
             },
         },
@@ -84,11 +131,12 @@ namespace ntt
             {
                 std::regex regex(rule.regex);
                 std::smatch match;
-                if (std::regex_search(tempCode, match, regex))
+                const std::string currentTempString = tempCode;
+                if (std::regex_search(currentTempString, match, regex))
                 {
                     is_matched = true;
-                    m_tokens.push_back(rule.callback(match));
                     tempCode = tempCode.substr(match.position() + match.length());
+                    m_tokens.push_back(rule.callback(match, tempCode));
                     break;
                 }
             }

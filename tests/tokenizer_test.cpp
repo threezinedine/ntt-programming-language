@@ -20,6 +20,16 @@ using namespace ntt;
 #define EXPECT_TOKEN_STRING(index, expectedValue) \
     EXPECT_TOKEN_TYPE(index, String);             \
     EXPECT_THAT(TO_STRING(tokenizer.get_token(index))->value, expectedValue)
+#define EXPECT_TOKEN_IDENTIFIER(index, expectedValue) \
+    EXPECT_TOKEN_TYPE(index, Identifier);             \
+    EXPECT_THAT(TO_IDENTIFIER(tokenizer.get_token(index))->value, expectedValue)
+#define EXPECT_TOKEN_INVALID_IDENTIFIER(index, expectedValue) \
+    EXPECT_TOKEN_TYPE(index, InvalidIdentifier);              \
+    EXPECT_THAT(TO_INVALID_IDENTIFIER(tokenizer.get_token(index))->value, expectedValue)
+#define EXPECT_TOKEN_KEYWORD(index, expectedValue) \
+    EXPECT_TOKEN_TYPE(index, Keyword);             \
+    EXPECT_THAT(TO_KEYWORD(tokenizer.get_token(index))->value, expectedValue)
+
 #define EXPECT_TOKEN_UNKNOWN(index, expectedValue) \
     EXPECT_TOKEN_TYPE(index, Unknown);             \
     EXPECT_THAT(TO_UNKNOWN(tokenizer.get_token(index))->value, expectedValue)
@@ -137,4 +147,40 @@ TEST(Tokenizer, extract_with_unknown_token)
     EXPECT_TOKEN_COUNT(2);
     EXPECT_TOKEN_UNKNOWN(0, '~');
     EXPECT_TOKEN_INTEGER(1, 325);
+}
+
+TEST(Tokenizer, extract_identifier)
+{
+    DEFINE_TOKEN("hello_world");
+    EXPECT_TOKEN_COUNT(1);
+    EXPECT_TOKEN_IDENTIFIER(0, "hello_world");
+}
+
+TEST(Tokenizer, extract_start_with_number_end_with_string)
+{
+    DEFINE_TOKEN("123hello_world");
+    EXPECT_TOKEN_COUNT(1);
+    EXPECT_TOKEN_INVALID_IDENTIFIER(0, "123hello_world");
+}
+
+TEST(Tokenizer, extract_identifier_with_number)
+{
+    DEFINE_TOKEN("hello123");
+    EXPECT_TOKEN_COUNT(1);
+    EXPECT_TOKEN_IDENTIFIER(0, "hello123");
+}
+
+TEST(Tokenizer, extract_keyword)
+{
+    DEFINE_TOKEN("if");
+    EXPECT_TOKEN_COUNT(1);
+    EXPECT_TOKEN_KEYWORD(0, "if");
+}
+
+TEST(Tokenizer, extract_similar_identifer_keyword)
+{
+    DEFINE_TOKEN("if_else else");
+    EXPECT_TOKEN_COUNT(2);
+    EXPECT_TOKEN_IDENTIFIER(0, "if_else");
+    EXPECT_TOKEN_KEYWORD(1, "else");
 }
