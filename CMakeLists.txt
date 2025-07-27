@@ -39,9 +39,9 @@ elseif (MINGW)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "Core")
-
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/examples)
+if (MSVC)
+    set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "Core")
+endif()
 
 file(
     GLOB
@@ -53,4 +53,32 @@ find_package(googletest REQUIRED)
 set(TEST_PROJECT_NAME ${PROJECT_NAME}_test)
 add_executable(${TEST_PROJECT_NAME} ${TEST_FILES})
 target_link_libraries(${TEST_PROJECT_NAME} PRIVATE ${PROJECT_NAME} gtest gtest_main gmock gmock_main)
-set_target_properties(${TEST_PROJECT_NAME} PROPERTIES FOLDER "Tests")
+if (MSVC)
+    set_target_properties(${TEST_PROJECT_NAME} PROPERTIES FOLDER "Tests")
+endif()
+
+# add examples 
+file(
+    GLOB
+    EXAMPLE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.cpp
+)
+
+set(IS_FIRST_EXAMPLE TRUE)
+
+foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
+    # extract file name without extension
+    get_filename_component(EXAMPLE_NAME ${EXAMPLE_FILE} NAME_WE)
+
+    add_executable(${EXAMPLE_NAME} ${EXAMPLE_FILE})
+    target_link_libraries(${EXAMPLE_NAME} PRIVATE ${PROJECT_NAME})
+
+    if(MSCV)
+        set_target_properties(${EXAMPLE_NAME} PROPERTIES FOLDER "Examples")
+        if (IS_FIRST_EXAMPLE)
+            set(IS_FIRST_EXAMPLE FALSE)
+            set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${EXAMPLE_NAME})
+            message(STATUS "Set ${EXAMPLE_NAME} as startup project")
+        endif()
+    endif()
+endforeach()
