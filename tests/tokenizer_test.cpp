@@ -29,6 +29,9 @@ using namespace ntt;
 #define EXPECT_TOKEN_KEYWORD(index, expectedValue) \
     EXPECT_TOKEN_TYPE(index, Keyword);             \
     EXPECT_THAT(TO_KEYWORD(tokenizer.get_token(index))->value, expectedValue)
+#define EXPECT_TOKEN_PARENTHESIS(index, expectedValue) \
+    EXPECT_TOKEN_TYPE(index, Parenthesis);             \
+    EXPECT_THAT(TO_PARENTHESIS(tokenizer.get_token(index))->value, expectedValue)
 
 #define EXPECT_TOKEN_UNKNOWN(index, expectedValue) \
     EXPECT_TOKEN_TYPE(index, Unknown);             \
@@ -145,7 +148,7 @@ TEST(Tokenizer, extract_with_unknown_token)
 {
     DEFINE_TOKEN("~325");
     EXPECT_TOKEN_COUNT(2);
-    EXPECT_TOKEN_UNKNOWN(0, '~');
+    EXPECT_TOKEN_UNKNOWN(0, "~");
     EXPECT_TOKEN_INTEGER(1, 325);
 }
 
@@ -183,4 +186,34 @@ TEST(Tokenizer, extract_similar_identifer_keyword)
     EXPECT_TOKEN_COUNT(2);
     EXPECT_TOKEN_IDENTIFIER(0, "if_else");
     EXPECT_TOKEN_KEYWORD(1, "else");
+}
+
+TEST(Tokenizer, extract_parenthesis)
+{
+    DEFINE_TOKEN("{(123)}[]");
+    EXPECT_TOKEN_COUNT(7);
+    EXPECT_TOKEN_PARENTHESIS(0, "{");
+    EXPECT_TOKEN_PARENTHESIS(1, "(");
+    EXPECT_TOKEN_INTEGER(2, 123);
+    EXPECT_TOKEN_PARENTHESIS(3, ")");
+    EXPECT_TOKEN_PARENTHESIS(4, "}");
+    EXPECT_TOKEN_PARENTHESIS(5, "[");
+    EXPECT_TOKEN_PARENTHESIS(6, "]");
+}
+
+TEST(Tokenizer, extract_if_statement)
+{
+    DEFINE_TOKEN("if (123) { 54f } else { 54 }");
+    EXPECT_TOKEN_COUNT(11);
+    EXPECT_TOKEN_KEYWORD(0, "if");
+    EXPECT_TOKEN_PARENTHESIS(1, "(");
+    EXPECT_TOKEN_INTEGER(2, 123);
+    EXPECT_TOKEN_PARENTHESIS(3, ")");
+    EXPECT_TOKEN_PARENTHESIS(4, "{");
+    EXPECT_TOKEN_FLOAT(5, 54);
+    EXPECT_TOKEN_PARENTHESIS(6, "}");
+    EXPECT_TOKEN_KEYWORD(7, "else");
+    EXPECT_TOKEN_PARENTHESIS(8, "{");
+    EXPECT_TOKEN_INTEGER(9, 54);
+    EXPECT_TOKEN_PARENTHESIS(10, "}");
 }

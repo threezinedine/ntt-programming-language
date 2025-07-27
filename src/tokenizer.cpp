@@ -50,6 +50,16 @@ namespace ntt
             },
         },
 
+        // parenthesis
+        {
+            R"(^[\(\{\[\]\}\)])",
+            [](const std::smatch &match, std::string &tempCode) -> Token *
+            {
+                NTT_UNUSED(tempCode);
+                return new ParenthesisToken(match[0].str());
+            },
+        },
+
         // invalid identifier
         {
             R"(^[0-9]+[a-eg-zA-EG-Z_]+[\S]*)",
@@ -143,7 +153,7 @@ namespace ntt
 
             if (!is_matched)
             {
-                m_tokens.push_back(new UnknownToken(tempCode[0]));
+                m_tokens.push_back(new UnknownToken(std::string(1, tempCode[0])));
                 tempCode = tempCode.substr(1);
             }
         }

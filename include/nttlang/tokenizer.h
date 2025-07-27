@@ -9,11 +9,12 @@ namespace ntt
     /// @brief Store all possible way each word or character must be categorized
     enum class TokenType
     {
-        Integer,    ///< Any integer number which contains negative sign
-        Float,      ///< Any float number which contains negative sign
-        String,     ///< Any string which is wrapped by double quotes or single quotes
-        Identifier, ///< Any identifier which is a sequence of letters, numbers, and underscores
-        Keyword,    ///< Any keyword which is a sequence of letters, numbers, and underscores
+        Integer,     ///< Any integer number which contains negative sign
+        Float,       ///< Any float number which contains negative sign
+        String,      ///< Any string which is wrapped by double quotes or single quotes
+        Identifier,  ///< Any identifier which is a sequence of letters, numbers, and underscores
+        Keyword,     ///< Any keyword which is a sequence of letters, numbers, and underscores
+        Parenthesis, ///< Any parenthesis which is a sequence of letters, numbers, and underscores
 
         InvalidIdentifier, ///< Any identifier which is not a valid identifier
 
@@ -78,11 +79,18 @@ namespace ntt
         InvalidIdentifierToken(const std::string &value) : Token(TokenType::InvalidIdentifier), value(value) {}
     };
 
+    struct ParenthesisToken : public Token
+    {
+        std::string value; ///< The parenthesis value of this programming language
+
+        ParenthesisToken(const std::string &value) : Token(TokenType::Parenthesis), value(value) {}
+    };
+
     struct UnknownToken : public Token
     {
-        char value; ///< The character value of this programming language
+        std::string value; ///< The character value of this programming language
 
-        UnknownToken(char value) : Token(TokenType::Unknown), value(value) {}
+        UnknownToken(const std::string &value) : Token(TokenType::Unknown), value(value) {}
     };
 
     /**
@@ -129,4 +137,5 @@ namespace ntt
 #define TO_IDENTIFIER(token) static_cast<::ntt::IdentifierToken *>(token)
 #define TO_KEYWORD(token) static_cast<::ntt::KeywordToken *>(token)
 #define TO_INVALID_IDENTIFIER(token) static_cast<::ntt::InvalidIdentifierToken *>(token)
+#define TO_PARENTHESIS(token) static_cast<::ntt::ParenthesisToken *>(token)
 #define TO_UNKNOWN(token) static_cast<::ntt::UnknownToken *>(token)
