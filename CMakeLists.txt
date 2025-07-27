@@ -73,7 +73,7 @@ foreach(EXAMPLE_FILE ${EXAMPLE_FILES})
     add_executable(${EXAMPLE_NAME} ${EXAMPLE_FILE})
     target_link_libraries(${EXAMPLE_NAME} PRIVATE ${PROJECT_NAME})
 
-    if(MSCV)
+    if(MSVC)
         set_target_properties(${EXAMPLE_NAME} PROPERTIES FOLDER "Examples")
         if (IS_FIRST_EXAMPLE)
             set(IS_FIRST_EXAMPLE FALSE)
