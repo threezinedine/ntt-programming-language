@@ -255,7 +255,8 @@ TEST(Tokenizer, extract_define_statement)
 
 TEST(Tokenizer, extract_checking_statement)
 {
-    DEFINE_TOKEN(" i     == 3.14;  \n   i != 3.14f;");
+    DEFINE_TOKEN(R"( i     == 3.14;  
+   i != 3.14f;)");
     EXPECT_TOKEN_COUNT(8);
     EXPECT_TOKEN_IDENTIFIER(0, "i");
     EXPECT_TOKEN_OPERATOR(1, "==");
@@ -265,4 +266,23 @@ TEST(Tokenizer, extract_checking_statement)
     EXPECT_TOKEN_OPERATOR(5, "!=");
     EXPECT_TOKEN_FLOAT(6, 3.14);
     EXPECT_TOKEN_SEPARATOR(7, ";");
+}
+
+TEST(Tokenizer, extract_example_if_block)
+{
+    DEFINE_TOKEN(R"(if (i < 10) {
+        i++;
+    })");
+    EXPECT_TOKEN_COUNT(11);
+    EXPECT_TOKEN_KEYWORD(0, "if");
+    EXPECT_TOKEN_PARENTHESIS(1, "(");
+    EXPECT_TOKEN_IDENTIFIER(2, "i");
+    EXPECT_TOKEN_OPERATOR(3, "<");
+    EXPECT_TOKEN_INTEGER(4, 10);
+    EXPECT_TOKEN_PARENTHESIS(5, ")");
+    EXPECT_TOKEN_PARENTHESIS(6, "{");
+    EXPECT_TOKEN_IDENTIFIER(7, "i");
+    EXPECT_TOKEN_OPERATOR(8, "++");
+    EXPECT_TOKEN_SEPARATOR(9, ";");
+    EXPECT_TOKEN_PARENTHESIS(10, "}");
 }
