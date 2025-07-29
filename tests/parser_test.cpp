@@ -5,8 +5,8 @@
 using namespace ntt;
 using namespace ::testing;
 
-#define DEFINE_TOKEN(code) \
-    Parser parser(code);   \
+#define DEFINE_CODE(code) \
+    Parser parser(code);  \
     ASTNode *root = parser.extract()
 
 #define EXPECT_AST_NODE_TYPE(node, expectedType) EXPECT_EQ(node->type, expectedType)
@@ -28,7 +28,7 @@ using namespace ::testing;
 
 TEST(Parser, extract_number)
 {
-    DEFINE_TOKEN("54");
+    DEFINE_CODE("54");
     EXPECT_AST_NODE_START_POSITION(root, 0);
     EXPECT_AST_NODE_LENGTH(root, 2);
     EXPECT_INTEGER_NODE_VALUE(root, 54);
@@ -36,7 +36,7 @@ TEST(Parser, extract_number)
 
 TEST(Parser, extract_float)
 {
-    DEFINE_TOKEN("54.12");
+    DEFINE_CODE("54.12");
     EXPECT_AST_NODE_START_POSITION(root, 0);
     EXPECT_AST_NODE_LENGTH(root, 5);
     EXPECT_FLOAT_NODE_VALUE(root, 54.12);
@@ -44,7 +44,7 @@ TEST(Parser, extract_float)
 
 TEST(Parser, extract_string)
 {
-    DEFINE_TOKEN(R"("Hello, World!")");
+    DEFINE_CODE(R"("Hello, World!")");
     EXPECT_AST_NODE_START_POSITION(root, 0);
     EXPECT_AST_NODE_LENGTH(root, 15);
     EXPECT_STRING_NODE_VALUE(root, "Hello, World!");
