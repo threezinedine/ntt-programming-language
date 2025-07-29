@@ -1,7 +1,22 @@
 #include "nttlang/parser.h"
+#include "nttlang/nodes/nodes.h"
 
 namespace ntt
 {
+
+    ASTNodeStatement::~ASTNodeStatement()
+    {
+        delete expression;
+    }
+
+    ASTNodeProgram::~ASTNodeProgram()
+    {
+        for (auto statement : statements)
+        {
+            delete statement;
+        }
+    }
+
     Parser::Parser(const std::string &code) : m_tokenizer(code), m_root(nullptr)
     {
     }
@@ -20,7 +35,7 @@ namespace ntt
 
         if (m_tokenizer.get_token_count() == 0)
         {
-            m_root = new ASTNode(ASTNodeType::Root, 0, 0);
+            m_root = new ASTNodeProgram(0, 0);
             return m_root;
         }
 
@@ -42,7 +57,7 @@ namespace ntt
                                        TO_STRING(m_tokenizer.get_token(0))->value);
             break;
         default:
-            throw std::runtime_error("Not implemented type: " + TYPE_TO_STRING(m_tokenizer.get_token(0)->type));
+            throw std::runtime_error("Not implemented type: " + TOKEN_TYPE_TO_STRING(m_tokenizer.get_token(0)->type));
         }
 
         return m_root;
